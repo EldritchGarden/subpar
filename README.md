@@ -13,6 +13,7 @@ trust me it'll help when making the README and any other markdown files. Markdow
 Feel free to add ideas here if you'd like.
 
 * Discord Bot
+* iCloud slideshow anti-stupidity program (I hate iCloud so much)
 
 ## I Wanted To
 introduce myself in this readme since:
