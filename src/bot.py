@@ -8,8 +8,7 @@ prefix = '?'  # TODO make configurable
 bot = commands.Bot(prefix)
 
 # setup cogs
-# each cog should have setup function
-#
+# TODO
 
 # start bot
 bot.run('token')  # TODO add token
