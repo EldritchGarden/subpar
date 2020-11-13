@@ -10,7 +10,7 @@ import time
 # path globals
 ROOT_PATH = Path(__file__).parent.absolute()
 LOG_PATH = Path(ROOT_PATH.parent / "logs")
-TOKEN_PATH = Path(ROOT_PATH / 'token')
+TOKEN_PATH = Path(ROOT_PATH / 'bot.token')
 
 if not LOG_PATH.exists():
     LOG_PATH.mkdir()  # create log dir if necessary
