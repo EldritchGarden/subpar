@@ -55,20 +55,29 @@ class Sub:
 
 
 class WeeklySale:
-    """Represent a weekly Publix Sale"""
+    """Represent a weekly Publix Sale
 
-    def __init__(self, sub: Sub, score=0):
+    Initialization:
+        [Sub] sub | sub object representing sub for this week
+        [int] score=0 | popularity score starts at 0
+        [datetime] start_date=None | optionally define sale start date
+    """
+
+    def __init__(self, sub: Sub, score=0, start_date=None):
         # date range
-        today = date.today()
+        if not start_date:
+            today = date.today()
 
-        start_delta = (today.weekday() - 3) % 7  # delta last thursday
-        last_thursday = today - timedelta(days=start_delta)
+            start_delta = (today.weekday() - 3) % 7  # delta last thursday
+            start_date = today - timedelta(days=start_delta)
 
-        end_delta = (today.weekday() - 2) % 7  # delta next wednesday
-        next_wednesday = today + timedelta(days=end_delta)
+            end_delta = (today.weekday() - 2) % 7  # delta next wednesday
+            end_date = today + timedelta(days=end_delta)
+        else:
+            end_date = start_date + timedelta(days=6)
 
         # formatted date range as str
-        self.week = "{} - {}".format(last_thursday.strftime("%m/%d/%y"), next_wednesday.strftime("%m/%d/%y"))
+        self.week = "{} - {}".format(start_date.strftime("%m/%d/%y"), end_date.strftime("%m/%d/%y"))
 
         self.sub = sub
 
@@ -88,14 +97,18 @@ def weekly_sub(store_id='2500492') -> Sub:
     url = AD_URL.format(store_id)  # insert store id
     page = requests.get(url)  # get html source for url
 
+    error_msg = "There was an error processing your request. Please try again later."
+    if error_msg in page.text:
+        raise ValueError("Invalid Store Id %s" % store_id)  # handle invalid store ids
+
     parser = PageParser()
-    parser.feed(page)  # parse html
+    parser.feed(page.text)  # parse html
 
     if not parser.sub_name or not parser.sub_desc:  # check that parser found the sub
         sub = "N/A"
         desc = "N/A"
     else:
         sub = parser.sub_name
-        desc = parser.sub_desc
+        desc = parser.sub_desc.strip()
 
     return Sub(name=sub, description=desc)
