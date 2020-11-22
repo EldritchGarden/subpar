@@ -22,7 +22,7 @@ class Commands(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot  # bot context
-        self.current_deal = None  # track deal
+        self.current_deal = None  # track deal TODO
 
     @commands.command(help="Show the sale for this week")
     async def deal(self, ctx):
