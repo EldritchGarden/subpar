@@ -60,7 +60,7 @@ class WeeklySale:
     Initialization:
         [Sub] sub | sub object representing sub for this week
         [int] score=0 | popularity score starts at 0
-        [datetime] start_date=None | optionally define sale start date
+        [datetime] start_date=None | optionally define sale start date (datetime)
     """
 
     def __init__(self, sub: Sub, score=0, start_date=None):
