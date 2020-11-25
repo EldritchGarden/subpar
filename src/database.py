@@ -31,6 +31,9 @@ def r_current_sale() -> src.publix.WeeklySale:
 def r_subscribed_users(sub: str) -> list:
     """Return list of users subscribed to a specific sub"""
 
+    # RETURN EMPTY LIST TODO REMOVE THIS
+    return []
+
     con = sqlite3.connect(DB_PATH)  # db connection
     cur = con.cursor()  # create cursor
 
@@ -38,11 +41,11 @@ def r_subscribed_users(sub: str) -> list:
     # cur.execute("""SQL QUERY""")
 
     # validate sub entry exists
-    # get list of users from blob
+    # get list of users
 
     con.close()  # close connection
 
-    # return list of users
+    # return list of user id's (ID'S SHOULD BE INT)
 
 
 def w_current_sale(sale: src.publix.WeeklySale):
