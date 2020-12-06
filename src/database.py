@@ -59,8 +59,7 @@ def r_subscribed_users(sub: str) -> list:
                 user_list = row[1].split(':')
                 break
 
-        if user_list:
-            user_list = [int(u) for u in user_list]
+        user_list = [int(u) for u in user_list if u]
 
         return user_list
 
