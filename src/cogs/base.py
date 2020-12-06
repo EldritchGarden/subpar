@@ -5,6 +5,7 @@ Defines the basic bot commands
 import logging
 from discord.ext import commands
 import src.publix
+import src.database
 
 log = logging.getLogger("cogs.base")
 
@@ -22,14 +23,37 @@ class Commands(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot  # bot context
-        self.current_deal = None  # track deal TODO
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        """Track sub ratings
+
+        Triggers when a user reacts to a message from the bot triggered by ?deals
+
+        Arguments:
+            reaction | discord.reaction passed automatically
+            user     | discord.user passed automatically
+        """
+        msg = reaction.message
+        if msg.author.id == 776888684845727804:  # ensure message author was self
+            if reaction.emoji == '👍':  # if thumbs up
+                val = 1
+            elif reaction.emoji == '👎':  # thumbs down
+                val = -1
+            else:
+                return
+
+            # update score in db
+            sale = src.database.r_current_sale()
+            sale.score = int(sale.score) + val
+            src.database.w_update_score(sale)
 
     @commands.command(help="Show the sale for this week")
     async def deal(self, ctx):
         """Fetch and display information about the current Publix Sub on sale
 
         Arguments:
-            ctx | discord context
+            ctx | discord.context passed automatically
         """
 
         # TODO check ctx for store_id set in db?
