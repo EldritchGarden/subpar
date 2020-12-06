@@ -21,7 +21,7 @@ class PageParser(HTMLParser):
     Override handler methods for functionality.
     """
 
-    r = re.compile('^Publix Deli .*? Sub', re.IGNORECASE)
+    r = re.compile('.*? Sub', re.IGNORECASE)
     sFlag = False  # trigger flag when sub is found
     dFlag = False  # trigger flag when description is found
     cFlag = False  # trigger when feed should close
@@ -41,7 +41,7 @@ class PageParser(HTMLParser):
     def handle_data(self, data):
         if not self.cFlag and self.dFlag:
             self.sub_desc = data
-        elif not self.cFlag and self.r.match(data):
+        elif not self.cFlag and self.r.match(data) and "combo" not in data.lower():
             self.sub_name = data
             self.sFlag = True
 
@@ -60,12 +60,11 @@ class WeeklySale:
     Initialization:
         [Sub] sub | sub object representing sub for this week
         [int] score=0 | popularity score starts at 0
-        [datetime] start_date=None | optionally define sale start date (datetime)
+        [datetime] start_date=None | optionally define sale start date, otherwise is calculated automatically
     """
 
     def __init__(self, sub: Sub, score=0, start_date=None):
-        # date range
-        if not start_date:
+        if not start_date:  # calculate start date if not provided
             today = date.today()
 
             start_delta = (today.weekday() - 3) % 7  # delta last thursday
@@ -76,12 +75,12 @@ class WeeklySale:
         else:
             end_date = start_date + timedelta(days=6)
 
-        # formatted date range as str
-        self.week = "{} - {}".format(start_date.strftime("%m/%d/%y"), end_date.strftime("%m/%d/%y"))
+        self.start = start_date
+        self.end = end_date
 
         self.sub = sub
 
-        self.score = score  # TODO who handles score?
+        self.score = score
 
 
 def weekly_sub(store_id='2500492') -> Sub:
