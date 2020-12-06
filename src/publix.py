@@ -53,6 +53,10 @@ class Sub:
     name: str  # name of the sub
     description: str  # description of the sub
 
+    #def __post_init__(self):
+        # strip all non utf-8 characters from names
+        #self.name = bytes(self.name, 'ascii').decode('ascii', 'replace').replace('?', '')
+
 
 class WeeklySale:
     """Represent a weekly Publix Sale

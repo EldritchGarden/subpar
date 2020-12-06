@@ -59,7 +59,10 @@ def r_subscribed_users(sub: str) -> list:
                 user_list = row[1].split(':')
                 break
 
-        return [int(u) for u in user_list]
+        if user_list:
+            user_list = [int(u) for u in user_list]
+
+        return user_list
 
 
 def w_sale(sale: src.publix.WeeklySale):
