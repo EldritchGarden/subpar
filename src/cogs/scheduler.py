@@ -40,7 +40,7 @@ class Cron(commands.Cog):
         await self.bot.wait_until_ready()  # wait for bot to build internal cache
 
         # get subscriber list for current sub
-        sub = publix.weekly_sub()
+        sub = database.r_current_sale().sub
         message = f"Good news! A sub you like is on sale!\n{sub.name}\n{sub.description}"
 
         sub_users = database.r_subscribed_users(sub.name)
