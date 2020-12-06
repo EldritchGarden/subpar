@@ -104,7 +104,6 @@ def w_subscribed_users(sub: str, users: list, overwrite=False):
         for row in c_reader:
             if row[0] == sub:
                 c_writer.writerow([row[0], ':'.join(user_list)])
-                print(row[0], user_list)
                 write_flag = True
             else:
                 c_writer.writerow(row)
