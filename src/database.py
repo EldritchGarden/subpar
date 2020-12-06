@@ -7,91 +7,127 @@ Interface operations are prefixed with the operation scope:
     rw for Read/Write operations
 """
 
-import sqlite3
+import csv
+from datetime import datetime, timedelta
 import src.publix
-from src import DB_PATH
+from src import SALE_PATH, SUB_PATH
 
 
 def r_current_sale() -> src.publix.WeeklySale:
     """Reads the current sale from database and returns a WeeklySale object"""
 
-    con = sqlite3.connect(DB_PATH)  # db connection
-    cur = con.cursor()  # create cursor
+    def in_range(start_date, end_date):
+        today = datetime.today().date()
+        start_date = datetime.strptime(start_date, "%m%d%Y").date()
+        end_date = datetime.strptime(end_date, "%m%d%Y").date()
 
-    ## Execute SQL commands ##
-    # cur.execute("""SQL QUERY""")
+        # check that today is within date range
+        # start day is same or before current day (positive timedelta)
+        # end day is same or after current day (negative timedelta)
+        if ((today - start_date).days >= 0) and ((today - end_date).days <= 0):
+            return True
+        else:
+            return False
 
-    # create WeeklySale object from data
+    with open(SALE_PATH, newline='') as csvfile:
+        c_reader = csv.reader(csvfile, delimiter=',')
+        sale = None
+        for row in c_reader:
+            if in_range(row[0], row[1]):
+                sale = row
+                break
 
-    con.close()  # close connection
+        if not sale:
+            sub = src.publix.weekly_sub()
+            sale = src.publix.WeeklySale(sub)
+            w_sale(sale)
+        else:
+            sub = src.publix.Sub(sale[2], sale[3])
+            sale = src.publix.WeeklySale(sub, score=sale[4], start_date=datetime.strptime(sale[0], "%m%d%Y"))
 
-    # return WeeklySale object
+        return sale
 
 
 def r_subscribed_users(sub: str) -> list:
     """Return list of users subscribed to a specific sub"""
 
-    # RETURN EMPTY LIST TODO REMOVE THIS
-    return []
+    with open(SUB_PATH, newline='') as csvfile:
+        c_reader = csv.reader(csvfile, delimiter=',')
+        user_list = []
+        for row in c_reader:
+            if row[0] == sub:
+                user_list = row[1].split(':')
+                break
 
-    con = sqlite3.connect(DB_PATH)  # db connection
-    cur = con.cursor()  # create cursor
-
-    ## Execute SQL commands ##
-    # cur.execute("""SQL QUERY""")
-
-    # validate sub entry exists
-    # get list of users
-
-    con.close()  # close connection
-
-    # return list of user id's (ID'S SHOULD BE INT)
+        return [int(u) for u in user_list]
 
 
-def w_current_sale(sale: src.publix.WeeklySale):
-    """Overwrite current sale in db with provided WeeklySale object"""
+def w_sale(sale: src.publix.WeeklySale):
+    """Write a new sale to the db"""
 
-    con = sqlite3.connect(DB_PATH)  # db connection
-    cur = con.cursor()  # create cursor
+    with open(SALE_PATH, 'w', newline='') as csvfile:
+        c_writer = csv.writer(csvfile, delimiter=',')
+        c_writer.writerow(
+            [sale.start.strftime("%m%d%Y"),
+             sale.end.strftime("%m%d%Y"),
+             sale.sub.name,
+             sale.sub.description,
+             sale.score]
+        )
 
-    # convert WeeklySale object into SQL query
 
-    ## Execute SQL commands ##
-    # cur.execute("""SQL QUERY""")
-
-    con.commit()  # commit changes
-    con.close()  # close connection
-
-
-def w_subscribed_users(sub: str, users: list):
+def w_subscribed_users(sub: str, users: list, overwrite=False):
     """Append users to list of subscribed users for a specific sub"""
 
-    con = sqlite3.connect(DB_PATH)  # db connection
-    cur = con.cursor()  # create cursor
+    # combine and cast to str
+    if overwrite:
+        temp = users
+    else:
+        temp = r_subscribed_users(sub)
+        temp.extend(users)
 
-    ## Execute SQL commands ##
-    # cur.execute("""SQL QUERY""")
+    temp = [str(u) for u in temp]
 
-    # validate currently subscribed users
-    # read currently subscribed users
-    # append 'users' to currently subscribed
-    # write new list
+    # filter duplicates
+    user_list = []
+    for u in temp:
+        if u not in user_list:
+            user_list.append(u)
 
-    con.commit()  # commit changes
-    con.close()  # close connection
+    with open(SUB_PATH, newline='') as inf:
+        c_reader = csv.reader(inf.readlines(), delimiter=',')
+
+    with open(SUB_PATH, 'w', newline='') as csvfile:
+        c_writer = csv.writer(csvfile, delimiter=',')
+        write_flag = False  # has the list been written
+
+        for row in c_reader:
+            if row[0] == sub:
+                c_writer.writerow([row[0], ':'.join(user_list)])
+                print(row[0], user_list)
+                write_flag = True
+            else:
+                c_writer.writerow(row)
+
+        if not write_flag:  # add a new row if one didnt exist for sub
+            c_writer.writerow([sub, ':'.join(user_list)])
 
 
-def rw_new_current_sale(sale: src.publix.WeeklySale):
-    """Updates the current sale with a new object"""
+def w_update_score(sale: src.publix.WeeklySale):
+    with open(SALE_PATH, newline='') as inf:
+        c_reader = csv.reader(inf.readlines(), delimiter=',')
 
-    con = sqlite3.connect(DB_PATH)  # db connection
-    cur = con.cursor()  # create cursor
+    with open(SALE_PATH, 'w', newline='') as csvfile:
+        c_writer = csv.writer(csvfile, delimiter=',')
+        start = sale.start.strftime("%m%d%Y")
+        write_flag = False
 
-    ## Execute SQL commands ##
-    # cur.execute("""SQL QUERY""")
+        for row in c_reader:
+            if row[0] == start:
+                c_writer.writerow([row[0], row[1], row[2], row[3], sale.score])
+                write_flag = True
+            else:
+                c_writer.writerow(row)
 
-    # update old sale to current=False
-    # create new entry for sale with current=True
-
-    con.commit()  # commit changes
-    con.close()  # close connection
+        if not write_flag:
+            w_sale(sale)  # write new sale if not found in db

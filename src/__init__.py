@@ -11,7 +11,8 @@ import time
 ROOT_PATH = Path(__file__).parent.absolute()
 LOG_PATH = Path(ROOT_PATH.parent / "logs")
 TOKEN_PATH = Path(ROOT_PATH / 'bot.token')
-DB_PATH = Path(ROOT_PATH.parent / 'db' / 'sub-par.sqlite')
+SALE_PATH = Path(ROOT_PATH.parent / 'db' / 'sales.csv')
+SUB_PATH = Path(ROOT_PATH.parent / 'db' / 'subscription.csv')
 
 if not LOG_PATH.exists():
     LOG_PATH.mkdir()  # create log dir if necessary
