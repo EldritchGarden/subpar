@@ -40,7 +40,7 @@ class Cron(commands.Cog):
         await self.bot.wait_until_ready()  # wait for bot to build internal cache
 
         # get subscriber list for current sub
-        sub = publix.weekly_sub()
+        sub = database.r_current_sale().sub
         message = f"Good news! A sub you like is on sale!\n{sub.name}\n{sub.description}"
 
         sub_users = database.r_subscribed_users(sub.name)
@@ -90,7 +90,6 @@ class Cron(commands.Cog):
         user_list = database.r_subscribed_users(sub.name)
 
         user_list.remove(ctx.author.id)  # remove id from list
-        print(user_list)
         database.w_subscribed_users(sub.name, user_list, overwrite=True)  # write new user list
         await ctx.send(f"{ctx.author.name} is now unsubscribed from notifications for {sub.name}")
 

@@ -15,13 +15,15 @@ Sub-Par currently provides the following features:
 
 ## Usage
 The bot uses the command prefix `?` to run commands:
+* `?help`
+  * Show the bot help message
 * `?deal`
-    * Show the current sub on sale and its description.
-    * React to the message with a thumbs up/down to rate the sub
+  * Show the current sub on sale and its description.
+  * React to the message with a thumbs up/down to rate the sub
 * `?subscribe`
-    * Get notifications (in your DMs) when a sub goes on sale
+  * Get notifications (in your DMs) when a sub goes on sale
 * `?unsubscribe`
-    * Like `?subscribe` but... 'un'
+  * Like `?subscribe` but... 'un'
 
 ## The Package
 All the important code is in `src/` and can (should) be run using `main.py` in the root.
@@ -29,3 +31,20 @@ The `src/` directory contains the python files, as well as a sub-folder `cogs/` 
 The token should be in a file named `bot.token` and is used to authenticate the bot with Discord.
 The `cogs/` directory contains the definitions for the commands and listeners to register to the bot,
 and are organized logically by scope.
+
+### Installation
+Dependencies are listed in the `requirements.txt` file, and local copies of each dependency
+have been downloaded to `lib/`. There are two methods for installation:
+
+1. `pip install -r requirements.txt`
+2. `pip install -r requirements.txt --no-index --find-links file://lib/`
+
+Method 1 is a simple online install downloading the requirements, whereas method
+2 uses the local copies of the required packages. 
+
+NOTE: `requirements.txt` and `lib/` should be the paths to requirements.txt
+and lib/.
+
+### Data Storage
+The 'database' is stored in `db/` and stores all data that needs to be saved. This is
+the most important for backups.

@@ -59,7 +59,7 @@ class Commands(commands.Cog):
         # TODO check ctx for store_id set in db?
 
         try:
-            sub = src.publix.weekly_sub()
+            sub = src.database.r_current_sale().sub
         except ValueError as e:  # catch invalid store id
             log.error(e)
             await ctx.send(e)
