@@ -78,7 +78,9 @@ class Cron(commands.Cog):
         """Subscribe user to current sale"""
 
         # add user id to subscriber db
-        database.w_subscribed_users(publix.weekly_sub().name, ctx.author.id)
+        sub = publix.weekly_sub()
+        database.w_subscribed_users(sub.name, [ctx.author.id])
+        await ctx.send(f"{ctx.author.name} is now subscribed to notifications for {sub.name}!")
 
     @commands.command(help="Unsubscribe from notifications for future sales of this week's sub")
     async def unsubscribe(self, ctx):
@@ -88,7 +90,9 @@ class Cron(commands.Cog):
         user_list = database.r_subscribed_users(sub.name)
 
         user_list.remove(ctx.author.id)  # remove id from list
-        database.w_subscribed_users(sub.name, user_list)  # write new user list
+        print(user_list)
+        database.w_subscribed_users(sub.name, user_list, overwrite=True)  # write new user list
+        await ctx.send(f"{ctx.author.name} is now unsubscribed from notifications for {sub.name}")
 
 
 def register(bot: commands.Bot):
