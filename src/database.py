@@ -7,10 +7,35 @@ Interface operations are prefixed with the operation scope:
     rw for Read/Write operations
 """
 
-import csv
 from datetime import datetime, timedelta
+import sqlite3
 import src.publix
-from src import SALE_PATH, SUB_PATH
+from src import DB_PATH
+
+
+def initialize_db():
+    """Initialize an empty database"""
+
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.execute(  # create sales table
+        """CREATE TABLE "sales" (
+            "id"	INTEGER NOT NULL UNIQUE,
+            "start"	TEXT NOT NULL UNIQUE,
+            "end"	TEXT NOT NULL UNIQUE,
+            "sub"	TEXT NOT NULL,
+            "desc"	TEXT NOT NULL,
+            "score"	INTEGER,
+            PRIMARY KEY("id" AUTOINCREMENT)
+        );"""
+    )
+
+    conn.execute(  # create subscriptions table
+        """CREATE TABLE "subscription" (
+            "sub"	TEXT NOT NULL UNIQUE,
+            "users"	TEXT,
+            PRIMARY KEY("sub")
+        );"""
+    )
 
 
 def r_current_sale() -> src.publix.WeeklySale:
